@@ -1,4 +1,4 @@
-"""birds.csv を検証し、固有の鳥だけを birds.json に出力する。"""
+"""Validate birds.csv and write only the proper birds to birds.json."""
 import csv
 import json
 from pathlib import Path
@@ -7,23 +7,23 @@ ROOT = Path(__file__).parent
 
 
 def parse_body(body, params):
-    """束縛変数のみからなる左結合の適用式を、int と [l, r] の入れ子に変換する。"""
+    """Convert a left-associative application of bound variables into nested ints and [l, r] pairs."""
     pos = 0
 
     def atom():
         nonlocal pos
         if pos >= len(body):
-            raise ValueError(f"式が途中で終わっています: {body}")
+            raise ValueError(f"unexpected end of expression: {body}")
         ch = body[pos]
         if ch == "(":
             pos += 1
             inner = app()
             if pos >= len(body) or body[pos] != ")":
-                raise ValueError(f"括弧が閉じていません: {body}")
+                raise ValueError(f"unclosed parenthesis: {body}")
             pos += 1
             return inner
         if ch not in params:
-            raise ValueError(f"束縛されていない記号 {ch}: {body}")
+            raise ValueError(f"unbound symbol {ch}: {body}")
         pos += 1
         return params.index(ch)
 
@@ -35,7 +35,7 @@ def parse_body(body, params):
 
     term = app()
     if pos != len(body):
-        raise ValueError(f"余分な文字があります: {body}")
+        raise ValueError(f"trailing characters: {body}")
     return term
 
 
@@ -49,7 +49,7 @@ def load(path=ROOT / "birds.csv", in_book_only=False):
                 continue
             head, body = row["lambda"].removeprefix("λ").split(".", 1)
             if len(head) != int(row["arity"]):
-                raise ValueError(f"{row['symbol']}: arity と束縛変数の数が不一致")
+                raise ValueError(f"{row['symbol']}: arity does not match the number of bound variables")
             birds.append(
                 {
                     "symbol": row["symbol"],
@@ -64,11 +64,11 @@ def load(path=ROOT / "birds.csv", in_book_only=False):
 def main():
     birds = load()
     if len(birds) != 47:
-        raise SystemExit(f"47 羽のはずが {len(birds)} 羽です")
+        raise SystemExit(f"expected 47 birds, found {len(birds)}")
     (ROOT / "birds.json").write_text(
         json.dumps(birds, ensure_ascii=False, indent=1), encoding="utf-8"
     )
-    print(f"{len(birds)} 羽を birds.json に出力しました")
+    print(f"wrote {len(birds)} birds to birds.json")
 
 
 if __name__ == "__main__":

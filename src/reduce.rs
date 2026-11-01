@@ -1,4 +1,4 @@
-//! 最左最外戦略の弱簡約器。ステップ数と木のサイズの上限つき。
+//! Leftmost-outermost weak reducer, bounded by step count and tree size.
 use crate::term::{Arena, Birds, Id, Node};
 
 #[derive(Clone, Copy, Debug)]
@@ -13,7 +13,7 @@ pub const DEFAULT_LIMITS: Limits = Limits {
 };
 
 impl Arena {
-    /// 正規形を返す。上限を超えたら `None`。
+    /// Return the normal form, or `None` if a limit is exceeded.
     pub fn nf(&mut self, t: Id, birds: &Birds, lim: Limits) -> Option<Id> {
         let mut steps = 0;
         self.nf_inner(t, birds, lim, &mut steps)
@@ -28,7 +28,7 @@ impl Arena {
                     self.memo.insert(v, r);
                 }
             }
-            // 上限を超えた項は覚えておき、同じ計算を繰り返さない。
+            // Remember terms that exceeded a limit to avoid repeating the work.
             None => self.failed.extend(visited),
         }
         result
@@ -54,7 +54,7 @@ impl Arena {
             if self.tree_size(cur) > lim.max_nodes {
                 return None;
             }
-            // args は最後の引数が先頭に来る。
+            // `args` holds the last argument first.
             let mut args = Vec::new();
             let mut head = cur;
             while let Node::App(l, r) = self.nodes[head as usize] {

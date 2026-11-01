@@ -1,6 +1,6 @@
-"""証拠項の独立検算。Rust のコードを共有せず、木の素朴な簡約で確かめる。
+"""Independently check witnesses with naive tree reduction, sharing no code with the Rust search.
 
-使い方: verify.py results/weak.jsonl results/ext.jsonl
+Usage: verify.py results/weak.jsonl results/ext.jsonl
 """
 import json
 import re
@@ -35,7 +35,7 @@ def parse(text):
             else:
                 atom = toks[pos]
                 if atom not in BIRDS:
-                    raise ValueError(f"未知の鳥 {atom}")
+                    raise ValueError(f"unknown bird {atom}")
                 pos += 1
             term = atom if term is None else (term, atom)
         return term
@@ -99,7 +99,7 @@ def apply_vars(t, start, stop):
 
 
 def normalize_vars(t, budget):
-    """("var", i) を原子として扱う正規化。"""
+    """Normalize, treating ("var", i) as an atom."""
     return normalize(encode(t), budget)
 
 
@@ -112,7 +112,7 @@ def encode(t):
 
 
 def check(witness, bird, mode):
-    """証拠項 `witness` が鳥 `bird` を定義することを確かめる。"""
+    """Check that the term `witness` defines the bird `bird`."""
     arity = BIRDS[bird]["arity"]
     rhs = var_rhs(BIRDS[bird]["rhs"])
     extras = range(0, 1) if mode == "weak" else range(0, MAX_EXTRA + 1)
@@ -141,15 +141,15 @@ def verify_record(rec, mode):
         w = parse(step["witness"])
         atoms = set(re.findall(r"[^\s()]+", step["witness"]))
         if not atoms <= known:
-            errors.append(f"{step['bird']}: 未定義の原子 {sorted(atoms - known)}")
+            errors.append(f"{step['bird']}: undefined atoms {sorted(atoms - known)}")
         if not check(w, step["bird"], mode):
-            errors.append(f"{step['bird']} = {step['witness']}: 検算失敗")
+            errors.append(f"{step['bird']} = {step['witness']}: check failed")
         known.add(step["bird"])
         if size(w) < EXPAND_LIMIT:
             defs[step["bird"]] = expand(w, defs)
     for goal in ("S", "K"):
         if goal not in known:
-            errors.append(f"{goal} の導出がありません")
+            errors.append(f"no derivation of {goal}")
     expanded = skipped = 0
     if mode == "weak" and not errors:
         for goal in ("S", "K"):
@@ -185,8 +185,8 @@ def main():
                 if errors:
                     failed += 1
                     print("NG", rec["birds"], errors[:3])
-        print(f"{path}: 完全な組 {checked} 件を検算、展開検算 成功 {expanded} / 未確認 {skipped}")
-    print("不一致:", failed)
+        print(f"{path}: checked {checked} complete sets; expanded checks: {expanded} passed, {skipped} unconfirmed")
+    print("Mismatches:", failed)
     sys.exit(1 if failed else 0)
 
 

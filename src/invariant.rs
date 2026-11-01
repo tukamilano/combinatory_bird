@@ -1,4 +1,4 @@
-//! 不完全性の証明書となる不変量。
+//! Invariants that certify incompleteness.
 use crate::term::{Bird, Birds};
 
 fn counts(b: &Bird) -> Vec<u32> {
@@ -15,7 +15,7 @@ pub fn is_duplicating(b: &Bird) -> bool {
     counts(b).iter().any(|&n| n > 1)
 }
 
-/// 組が不完全だと証明できれば、その理由を返す。
+/// Return the reason if the set is provably incomplete.
 pub fn certificate(birds: &Birds, mask: u64) -> Option<&'static str> {
     let members = || {
         birds

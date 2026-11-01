@@ -10,13 +10,13 @@ fn main() {
     let mut out_dir = PathBuf::from("results");
     let mut args = std::env::args().skip(1);
     while let Some(a) = args.next() {
-        let mut val = || args.next().expect("値がありません");
+        let mut val = || args.next().expect("missing value");
         match a.as_str() {
             "--max-subset" => max_subset = val().parse().unwrap(),
             "--mode" => mode = val(),
             "--budget" => budget = val().parse().unwrap(),
             "--out" => out_dir = PathBuf::from(val()),
-            _ => panic!("不明な引数: {a}"),
+            _ => panic!("unknown argument: {a}"),
         }
     }
     rayon::ThreadPoolBuilder::new()

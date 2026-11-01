@@ -1,4 +1,4 @@
-//! 不動点まで反復する閉包探索。
+//! Closure search iterated to a fixed point.
 use crate::reduce::{Limits, DEFAULT_LIMITS};
 use crate::term::{Arena, Birds, Id};
 use rustc_hash::FxHashMap;
@@ -6,10 +6,10 @@ use rustc_hash::FxHashMap;
 pub const MAX_ARGS: usize = 8;
 pub const SIZE_STEPS: [usize; 4] = [4, 6, 8, 10];
 const MAX_ARENA_NODES: usize = 5_000_000;
-/// これより大きい正規形を持つ項は代表にしない(未決定が増えるだけで誤判定はしない)。
+/// Terms with a larger normal form are not kept as representatives (this can add undecided sets but never a wrong verdict).
 pub const MAX_REP_NODES: u32 = 128;
 
-/// 既知の導出(Rathman の表など)。どれも照合を通して確かめるので、誤りがあっても無視されるだけ。
+/// Known derivations (from Rathman's table and elsewhere). Each is checked by matching, so an incorrect entry is simply ignored.
 const KNOWN: [(&str, &str); 46] = [
     ("S", "B (B (B W) C) (B B)"), ("I", "W K"), ("I", "S K K"), ("B", "S (K S) K"),
     ("C", "R R R"), ("C", "B (T (B B T)) (B B T)"), ("C", "S (B B S) (K K)"),
@@ -24,7 +24,7 @@ const KNOWN: [(&str, &str); 46] = [
     ("C**", "B C*"), ("R**", "B R*"), ("F**", "B F*"), ("V**", "B V*"),
 ];
 
-/// 「原子 `mask` が揃えば `expr` で `target` を定義できるはず」という規則。
+/// A rule: once the atoms in `mask` are available, `expr` should define `target`.
 #[derive(Clone, Debug)]
 pub struct Rule {
     pub target: usize,
@@ -109,7 +109,7 @@ struct Search<'a> {
     reps: Vec<Rep>,
     buckets: Vec<Vec<u32>>,
     keys: FxHashMap<(u8, Id), u32>,
-    /// 弱簡約版は k ごと、外延版は k = MAX_ARGS のみを使う。
+    /// Weak mode uses one table per k; extensional mode uses only k = MAX_ARGS.
     targets: Vec<FxHashMap<Id, Vec<usize>>>,
     atoms: u64,
     pending: Vec<(usize, Id)>,
@@ -125,7 +125,7 @@ impl Search<'_> {
         (self.atoms | self.pending_mask) >> bird & 1 == 0 && self.universe >> bird & 1 == 1
     }
 
-    /// k 個の変数を順に適用した正規形。
+    /// Normal form after applying k variables in order.
     fn nf_args(&mut self, start: Id, from: usize, to: usize) -> Option<Id> {
         let mut cur = start;
         let mut last = None;
@@ -208,8 +208,8 @@ impl Search<'_> {
         }
     }
 
-    /// 項を 1 つ処理する。`raw` は値どうしの適用、`wit` は原子上の証拠項。
-    /// 正規形がない項と、正規形が大きすぎる項は代表にしない。
+    /// Process one term. `raw` is an application of values; `wit` is the witness over the atoms.
+    /// Terms with no normal form, or one that is too large, are not kept as representatives.
     fn process(&mut self, raw: Id, wit: Id, size: usize) {
         let Some(val) = self.arena.nf(raw, self.birds, self.budget.limits) else {
             return;
@@ -221,7 +221,7 @@ impl Search<'_> {
             self.improve(idx, size, val, wit);
             return;
         }
-        // 弱簡約版は k = 0 の正規形だけがキー。外延版は k = MAX_ARGS も使う。
+        // Weak mode keys only on the k = 0 normal form; extensional mode also uses k = MAX_ARGS.
         let nf8 = match self.mode {
             Mode::Weak => None,
             Mode::Ext => self.nf_args(val, 0, MAX_ARGS),
@@ -251,7 +251,7 @@ impl Search<'_> {
         }
     }
 
-    /// 定義できた鳥を原子に加える。新しい鳥があれば `true`。
+    /// Add newly defined birds to the atoms. Returns `true` if there were any.
     fn commit(&mut self, out: &mut ClosureOut) -> bool {
         let new = std::mem::take(&mut self.pending);
         self.pending_mask = 0;
@@ -273,7 +273,7 @@ impl Search<'_> {
         self.done >= self.budget.candidates || self.arena.nodes.len() > MAX_ARENA_NODES
     }
 
-    /// サイズ上限 `limit` で 1 周する。`false` なら予算切れ。
+    /// Run one pass up to size `limit`. Returns `false` if the budget ran out.
     fn pass(&mut self, limit: usize, prev_limit: usize) -> bool {
         for n in 2..=limit {
             for i in 1..n {
@@ -313,7 +313,7 @@ impl Search<'_> {
     }
 }
 
-/// `seed` を原子として閉包を計算する。`universe` にない鳥は照合しない。
+/// Compute the closure with `seed` as atoms. Birds outside `universe` are not matched.
 pub fn closure(
     birds: &Birds,
     mode: Mode,
@@ -357,7 +357,7 @@ pub fn closure(
         s.targets[k].entry(t).or_default().push(i);
     }
     let mut out = ClosureOut::default();
-    // 先に全原子を登録し、シードどうしが互いの「導出」として記録されないようにする。
+    // Register all atoms first so seed birds are not recorded as derivations of each other.
     s.atoms = seed;
     for b in 0..birds.list.len() {
         if seed >> b & 1 == 1 {
@@ -373,7 +373,7 @@ pub fn closure(
         .filter(|&x| x <= budget.max_size)
         .collect();
     loop {
-        // 規則だけで増える分を先に使い切る。
+        // First exhaust what the rules alone can add.
         loop {
             s.apply_rules();
             if !s.commit(&mut out) {

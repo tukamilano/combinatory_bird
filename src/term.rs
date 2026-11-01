@@ -1,4 +1,4 @@
-//! ハッシュコンシングされた項と、鳥の定義。
+//! Hash-consed terms and bird definitions.
 use rustc_hash::FxHashMap;
 use serde_json::Value;
 
@@ -20,16 +20,16 @@ pub enum Rhs {
 impl Rhs {
     fn from_json(v: &Value) -> Rhs {
         match v {
-            Value::Number(n) => Rhs::Var(n.as_u64().expect("変数番号") as usize),
+            Value::Number(n) => Rhs::Var(n.as_u64().expect("variable index") as usize),
             Value::Array(a) => Rhs::App(
                 Box::new(Rhs::from_json(&a[0])),
                 Box::new(Rhs::from_json(&a[1])),
             ),
-            _ => panic!("不正な rhs: {v}"),
+            _ => panic!("invalid rhs: {v}"),
         }
     }
 
-    /// 各変数の出現回数を数える。
+    /// Count the occurrences of each variable.
     pub fn count_vars(&self, counts: &mut [u32]) {
         match self {
             Rhs::Var(i) => counts[*i] += 1,
@@ -55,11 +55,11 @@ pub struct Birds {
 
 impl Birds {
     pub fn load(path: &str) -> Birds {
-        let text = std::fs::read_to_string(path).expect("birds.json を読めません");
-        let v: Value = serde_json::from_str(&text).expect("birds.json の形式が不正です");
+        let text = std::fs::read_to_string(path).expect("cannot read birds.json");
+        let v: Value = serde_json::from_str(&text).expect("malformed birds.json");
         let list = v
             .as_array()
-            .expect("配列")
+            .expect("array")
             .iter()
             .map(|b| Bird {
                 symbol: b["symbol"].as_str().unwrap().to_string(),
@@ -74,7 +74,7 @@ impl Birds {
         self.list
             .iter()
             .position(|b| b.symbol == symbol)
-            .unwrap_or_else(|| panic!("未知の鳥: {symbol}"))
+            .unwrap_or_else(|| panic!("unknown bird: {symbol}"))
     }
 
     pub fn mask(&self, symbols: &[&str]) -> u64 {
@@ -140,7 +140,7 @@ impl Arena {
         self.intern(Node::App(l, r), size)
     }
 
-    /// 木としてのノード数(飽和加算)。
+    /// Node count as a tree (saturating).
     pub fn tree_size(&self, t: Id) -> u32 {
         self.sizes[t as usize]
     }
@@ -180,13 +180,13 @@ impl Arena {
         }
     }
 
-    /// `show` の形式の式を読む(既知の導出の入力用)。
+    /// Parse an expression in `show` format (used to read known derivations).
     pub fn parse(&mut self, text: &str, birds: &Birds) -> Id {
         let spaced = text.replace('(', " ( ").replace(')', " ) ");
         let tokens: Vec<&str> = spaced.split_whitespace().collect();
         let mut pos = 0;
         let t = self.parse_app(&tokens, &mut pos, birds);
-        assert_eq!(pos, tokens.len(), "式の末尾が不正: {text}");
+        assert_eq!(pos, tokens.len(), "invalid end of expression: {text}");
         t
     }
 
@@ -209,6 +209,6 @@ impl Arena {
                 Some(l) => self.app(l, atom),
             });
         }
-        term.expect("空の式")
+        term.expect("empty expression")
     }
 }

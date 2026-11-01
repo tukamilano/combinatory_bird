@@ -21,7 +21,7 @@ fn reducer_basic() {
     assert_eq!(a.nf(t, &b, DEFAULT_LIMITS), Some(i));
     let omega = a.parse("M M", &b);
     assert_eq!(a.nf(omega, &b, DEFAULT_LIMITS), None);
-    // 消去される発散項があっても正規形に到達する。
+    // Reaches a normal form even when a divergent term is erased.
     let t = a.parse("K I (M M)", &b);
     assert_eq!(a.nf(t, &b, DEFAULT_LIMITS), Some(i));
 }
@@ -75,7 +75,7 @@ fn invariants_hold_on_closures() {
 fn weak_and_ext_differ_on_identity() {
     let b = birds();
     let i = b.mask(&["I"]);
-    // 外延版の照合対象に I を含め、I* を原子に持たせる。
+    // Include I among the extensional targets and give I* as an atom.
     let all = (1u64 << b.list.len()) - 1;
     let budget = Budget::new(200_000);
     let seed = b.mask(&["I*"]);

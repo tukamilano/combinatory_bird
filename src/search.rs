@@ -1,4 +1,4 @@
-//! 部分集合の全探索。サイズの昇順に処理し、下のレベルの閉包を初期値に使う。
+//! Exhaustive subset search, in increasing size, seeded with the closures of the level below.
 use crate::closure::{base_rules, closure, Budget, ClosureOut, Deriv, Mode, Rule};
 use crate::invariant::certificate;
 use crate::term::Birds;
@@ -104,7 +104,7 @@ fn from_json(v: &Value, birds: &Birds) -> Rec {
     }
 }
 
-/// 外延版の探索対象。I* と I** は I と外延的に等しいので除く。
+/// Birds searched in extensional mode. I* and I** are excluded as extensionally equal to I.
 pub fn universe(birds: &Birds, mode: Mode) -> u64 {
     let all = (1u64 << birds.list.len()) - 1;
     match mode {
@@ -113,7 +113,7 @@ pub fn universe(birds: &Birds, mode: Mode) -> u64 {
     }
 }
 
-/// 弱簡約版で完全な組を、外延版の組に写して引き継ぐ。
+/// Carry sets complete in weak mode over to extensional mode.
 fn inherited_complete(birds: &Birds, weak: &[Rec]) -> FxHashMap<u64, Vec<Deriv>> {
     let i_class = birds.mask(&["I*", "I**"]);
     let i = birds.index("I");
@@ -154,7 +154,7 @@ pub struct Config<'a> {
     pub inherit: Vec<Rec>,
 }
 
-/// 部分集合をレベル順に処理する。レベルが揃って書き込まれていれば、そこから再開する。
+/// Process subsets level by level, resuming after any fully written levels.
 pub fn run(cfg: &Config) -> Vec<Rec> {
     let birds = cfg.birds;
     let uni = universe(birds, cfg.mode);
@@ -168,7 +168,7 @@ pub fn run(cfg: &Config) -> Vec<Rec> {
     let mut start = 1;
     let mut rules = base_rules(birds);
 
-    // 再開:レベルが完全に揃っている分だけ読み込む。
+    // Resume: load only the levels that are complete.
     let old = load_records(cfg.out, birds);
     let mut by_level: FxHashMap<usize, Vec<Rec>> = FxHashMap::default();
     for r in old {
@@ -196,14 +196,14 @@ pub fn run(cfg: &Config) -> Vec<Rec> {
         f
     };
     if start > 1 {
-        eprintln!("[{:?}] レベル {} までを再利用します", cfg.mode, start - 1);
+        eprintln!("[{:?}] reusing levels up to {}", cfg.mode, start - 1);
     }
 
     for k in start..=cfg.max_subset {
         let t0 = std::time::Instant::now();
         let subsets = combinations(&items, k);
 
-        // 1 段目:閉包を計算せずに決まるものを決め、残りの初期値を集める。
+        // Stage 1: settle what needs no closure and collect seeds for the rest.
         struct Prep {
             mask: u64,
             cert: Option<&'static str>,
@@ -273,8 +273,8 @@ pub fn run(cfg: &Config) -> Vec<Rec> {
             })
             .collect();
 
-        // 2 段目:初期値が同じ組は 1 回だけ閉包を計算する。
-        // 不変量で不完全な組は初期値を作るだけなので、予算を 1/10 にする。
+        // Stage 2: compute the closure once per distinct seed.
+        // Sets refuted by an invariant only provide seeds, so they get 1/10 of the budget.
         let full: FxHashSet<u64> = preps
             .iter()
             .filter(|p| p.needs_run && p.cert.is_none())
@@ -299,7 +299,7 @@ pub fn run(cfg: &Config) -> Vec<Rec> {
             })
             .collect();
         for (seed, out) in results {
-            // 見つけた導出を規則に加える。同じ鳥をより少ない原子で作れる規則があれば加えない。
+            // Add found derivations as rules, unless a rule already makes the bird from a subset of the atoms.
             for d in &out.chain {
                 let rule = Rule::new(birds, d.bird, &d.witness);
                 if !rules
@@ -322,7 +322,7 @@ pub fn run(cfg: &Config) -> Vec<Rec> {
             });
         }
 
-        // 3 段目:記録を確定する。
+        // Stage 3: finalize the records.
         let mut level = Vec::with_capacity(preps.len());
         for p in preps {
             let mut rec = Rec {
@@ -351,12 +351,12 @@ pub fn run(cfg: &Config) -> Vec<Rec> {
                 };
             }
             if p.cert.is_some() && rec.status == Status::Complete {
-                panic!("不変量に反します: {:?}", birds.symbols(p.mask));
+                panic!("invariant violated: {:?}", birds.symbols(p.mask));
             }
             level.push(rec);
         }
         for r in &level {
-            // 最終レベルの非完全な組は導出を残さない(ファイルサイズ削減)。
+            // Drop derivations of non-complete sets at the last level to reduce file size.
             if is_last && r.status != Status::Complete {
                 let mut slim = r.clone();
                 slim.chain.clear();
@@ -374,7 +374,7 @@ pub fn run(cfg: &Config) -> Vec<Rec> {
         let mut c: Vec<_> = counts.into_iter().collect();
         c.sort();
         eprintln!(
-            "[{:?}] size={k} 組={} 閉包計算={n_runs} {:.1}s {:?}",
+            "[{:?}] size={k} sets={} closures={n_runs} {:.1}s {:?}",
             cfg.mode,
             level.len(),
             t0.elapsed().as_secs_f64(),

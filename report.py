@@ -1,6 +1,6 @@
-"""探索結果を分類し、summary.md を出力する。
+"""Classify search results and write summary.md.
 
-使い方: report.py results/run1
+Usage: report.py results/run1 [max_size]
 """
 import itertools
 import json
@@ -23,7 +23,7 @@ def load(path):
 
 
 def canonical(subset):
-    """外延版の探索単位に写す。I の仲間が 2 羽以上なら None(非独立)。"""
+    """Map to the unit searched in extensional mode. None (non-independent) if it has two or more I-like birds."""
     members = subset & I_CLASS
     if len(members) >= 2:
         return None
@@ -31,7 +31,7 @@ def canonical(subset):
 
 
 def status_of(subset, records, mode):
-    """外延版は I, I*, I** を同一視した結果を引く。"""
+    """Extensional mode looks up the result with I, I*, I** identified."""
     if mode == "weak":
         return records[subset]["status"]
     c = canonical(subset)
@@ -46,7 +46,7 @@ def closure_of(subset, records, mode):
 
 
 def proven_incomplete(subset, records, mode, memo):
-    """組が不完全だと証明できるか。非独立の組は、閉包が等しい部分集合に帰着する。"""
+    """Whether the set is provably incomplete. A non-independent set reduces to a subset with the same closure."""
     if subset in memo:
         return memo[subset]
     status = status_of(subset, records, mode)
@@ -95,22 +95,22 @@ def main():
     weak = classify(load(out / "weak.jsonl"), "weak", max_size)
     ext = classify(load(out / "ext.jsonl"), "ext", max_size)
     labels = [
-        ("minimal", "極小確定"),
-        ("candidate", "極小候補"),
-        ("incomplete", "不完全(証明あり)"),
-        ("undecided", "未決定"),
-        ("non_minimal", "非極小"),
+        ("minimal", "Confirmed minimal"),
+        ("candidate", "Minimal candidate"),
+        ("incomplete", "Incomplete (proven)"),
+        ("undecided", "Undecided"),
+        ("non_minimal", "Non-minimal"),
     ]
-    lines = [f"# 極小完全基底の探索結果(サイズ {max_size} 以下)", ""]
-    lines += ["サイズ 5 以上の極小基底は範囲外。候補と未決定は上限つきの探索の結果であり、証明ではない。", ""]
-    lines += ["| 分類 | 弱簡約 | 外延 |", "|---|---:|---:|"]
+    lines = [f"# Minimal complete bases (size {max_size} or less)", ""]
+    lines += ["Minimal bases of size 5 or more are out of scope. Candidates and undecided sets come from a bounded search and are not proofs.", ""]
+    lines += ["| Class | Weak | Extensional |", "|---|---:|---:|"]
     for key, label in labels:
         lines.append(f"| {label} | {len(weak[key])} | {len(ext[key])} |")
-    lines.append(f"| 合計 | {sum(map(len, weak.values()))} | {sum(map(len, ext.values()))} |")
+    lines.append(f"| Total | {sum(map(len, weak.values()))} | {sum(map(len, ext.values()))} |")
     for key, label in labels[:2]:
-        for name, groups in (("弱簡約", weak), ("外延", ext)):
-            lines += ["", f"## {label}({name})", ""]
-            lines.append(", ".join(fmt(c) for c in groups[key]) or "なし")
+        for name, groups in (("weak", weak), ("extensional", ext)):
+            lines += ["", f"## {label} ({name})", ""]
+            lines.append(", ".join(fmt(c) for c in groups[key]) or "None")
 
     def classes(groups):
         return {frozenset(c): k for k, v in groups.items() for c in v}
@@ -118,11 +118,11 @@ def main():
     cw, ce = classes(weak), classes(ext)
     diff = [(c, cw[c], ce[c]) for c in cw if cw[c] != ce[c]]
     bad = [c for c, a, b in diff if a in ("minimal", "candidate") and b in ("incomplete", "undecided")]
-    lines += ["", "## 弱簡約と外延の差分", "", f"分類が異なる組: {len(diff)}", ""]
-    lines += ["弱簡約で完全なのに、外延で不完全または未決定の組: " + str(len(bad)), ""]
+    lines += ["", "## Differences between weak and extensional", "", f"Sets classified differently: {len(diff)}", ""]
+    lines += ["Sets complete in weak mode but incomplete or undecided in extensional mode: " + str(len(bad)), ""]
     interesting = [d for d in diff if {d[1], d[2]} & {"minimal", "candidate"}]
-    lines += ["完全性に関わる差分:", ""]
-    lines += [f"- {fmt(sorted(c))}: 弱簡約={a} / 外延={b}" for c, a, b in sorted(interesting, key=lambda d: (len(d[0]), sorted(d[0])))[:300]]
+    lines += ["Differences affecting completeness:", ""]
+    lines += [f"- {fmt(sorted(c))}: weak={a} / extensional={b}" for c, a, b in sorted(interesting, key=lambda d: (len(d[0]), sorted(d[0])))[:300]]
     text = "\n".join(lines) + "\n"
     (out / "summary.md").write_text(text, encoding="utf-8")
     print(text[:6000])

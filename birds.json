@@ -1,0 +1,644 @@
+[
+ {
+  "symbol": "B",
+  "name": "Bluebird",
+  "arity": 3,
+  "rhs": [
+   0,
+   [
+    1,
+    2
+   ]
+  ]
+ },
+ {
+  "symbol": "B1",
+  "name": "Blackbird",
+  "arity": 4,
+  "rhs": [
+   0,
+   [
+    [
+     1,
+     2
+    ],
+    3
+   ]
+  ]
+ },
+ {
+  "symbol": "B2",
+  "name": "Bunting",
+  "arity": 5,
+  "rhs": [
+   0,
+   [
+    [
+     [
+      1,
+      2
+     ],
+     3
+    ],
+    4
+   ]
+  ]
+ },
+ {
+  "symbol": "B3",
+  "name": "Becard",
+  "arity": 4,
+  "rhs": [
+   0,
+   [
+    1,
+    [
+     2,
+     3
+    ]
+   ]
+  ]
+ },
+ {
+  "symbol": "C",
+  "name": "Cardinal",
+  "arity": 3,
+  "rhs": [
+   [
+    0,
+    2
+   ],
+   1
+  ]
+ },
+ {
+  "symbol": "D",
+  "name": "Dove",
+  "arity": 4,
+  "rhs": [
+   [
+    0,
+    1
+   ],
+   [
+    2,
+    3
+   ]
+  ]
+ },
+ {
+  "symbol": "D1",
+  "name": "Dickcissel",
+  "arity": 5,
+  "rhs": [
+   [
+    [
+     0,
+     1
+    ],
+    2
+   ],
+   [
+    3,
+    4
+   ]
+  ]
+ },
+ {
+  "symbol": "D2",
+  "name": "Dovekies",
+  "arity": 5,
+  "rhs": [
+   [
+    0,
+    [
+     1,
+     2
+    ]
+   ],
+   [
+    3,
+    4
+   ]
+  ]
+ },
+ {
+  "symbol": "E",
+  "name": "Eagle",
+  "arity": 5,
+  "rhs": [
+   [
+    0,
+    1
+   ],
+   [
+    [
+     2,
+     3
+    ],
+    4
+   ]
+  ]
+ },
+ {
+  "symbol": "Ê",
+  "name": "Bald Eagle",
+  "arity": 7,
+  "rhs": [
+   [
+    0,
+    [
+     [
+      1,
+      2
+     ],
+     3
+    ]
+   ],
+   [
+    [
+     4,
+     5
+    ],
+    6
+   ]
+  ]
+ },
+ {
+  "symbol": "F",
+  "name": "Finch",
+  "arity": 3,
+  "rhs": [
+   [
+    2,
+    1
+   ],
+   0
+  ]
+ },
+ {
+  "symbol": "G",
+  "name": "Goldfinch",
+  "arity": 4,
+  "rhs": [
+   [
+    0,
+    3
+   ],
+   [
+    1,
+    2
+   ]
+  ]
+ },
+ {
+  "symbol": "H",
+  "name": "Hummingbird",
+  "arity": 3,
+  "rhs": [
+   [
+    [
+     0,
+     1
+    ],
+    2
+   ],
+   1
+  ]
+ },
+ {
+  "symbol": "I",
+  "name": "Identity Bird",
+  "arity": 1,
+  "rhs": 0
+ },
+ {
+  "symbol": "J",
+  "name": "Jay",
+  "arity": 4,
+  "rhs": [
+   [
+    0,
+    1
+   ],
+   [
+    [
+     0,
+     3
+    ],
+    2
+   ]
+  ]
+ },
+ {
+  "symbol": "K",
+  "name": "Kestrel",
+  "arity": 2,
+  "rhs": 0
+ },
+ {
+  "symbol": "L",
+  "name": "Lark",
+  "arity": 2,
+  "rhs": [
+   0,
+   [
+    1,
+    1
+   ]
+  ]
+ },
+ {
+  "symbol": "M",
+  "name": "Mockingbird",
+  "arity": 1,
+  "rhs": [
+   0,
+   0
+  ]
+ },
+ {
+  "symbol": "M2",
+  "name": "Double Mockingbird",
+  "arity": 2,
+  "rhs": [
+   [
+    0,
+    1
+   ],
+   [
+    0,
+    1
+   ]
+  ]
+ },
+ {
+  "symbol": "O",
+  "name": "Owl",
+  "arity": 2,
+  "rhs": [
+   1,
+   [
+    0,
+    1
+   ]
+  ]
+ },
+ {
+  "symbol": "Q",
+  "name": "Queer Bird",
+  "arity": 3,
+  "rhs": [
+   1,
+   [
+    0,
+    2
+   ]
+  ]
+ },
+ {
+  "symbol": "Q1",
+  "name": "Quixotic Bird",
+  "arity": 3,
+  "rhs": [
+   0,
+   [
+    2,
+    1
+   ]
+  ]
+ },
+ {
+  "symbol": "Q2",
+  "name": "Quizzical Bird",
+  "arity": 3,
+  "rhs": [
+   1,
+   [
+    2,
+    0
+   ]
+  ]
+ },
+ {
+  "symbol": "Q3",
+  "name": "Quirky Bird",
+  "arity": 3,
+  "rhs": [
+   2,
+   [
+    0,
+    1
+   ]
+  ]
+ },
+ {
+  "symbol": "Q4",
+  "name": "Quacky Bird",
+  "arity": 3,
+  "rhs": [
+   2,
+   [
+    1,
+    0
+   ]
+  ]
+ },
+ {
+  "symbol": "R",
+  "name": "Robin",
+  "arity": 3,
+  "rhs": [
+   [
+    1,
+    2
+   ],
+   0
+  ]
+ },
+ {
+  "symbol": "S",
+  "name": "Starling",
+  "arity": 3,
+  "rhs": [
+   [
+    0,
+    2
+   ],
+   [
+    1,
+    2
+   ]
+  ]
+ },
+ {
+  "symbol": "T",
+  "name": "Thrush",
+  "arity": 2,
+  "rhs": [
+   1,
+   0
+  ]
+ },
+ {
+  "symbol": "U",
+  "name": "Turing",
+  "arity": 2,
+  "rhs": [
+   1,
+   [
+    [
+     0,
+     0
+    ],
+    1
+   ]
+  ]
+ },
+ {
+  "symbol": "V",
+  "name": "Vireo",
+  "arity": 3,
+  "rhs": [
+   [
+    2,
+    0
+   ],
+   1
+  ]
+ },
+ {
+  "symbol": "W",
+  "name": "Warbler",
+  "arity": 2,
+  "rhs": [
+   [
+    0,
+    1
+   ],
+   1
+  ]
+ },
+ {
+  "symbol": "W1",
+  "name": "Converse Warbler",
+  "arity": 2,
+  "rhs": [
+   [
+    1,
+    0
+   ],
+   0
+  ]
+ },
+ {
+  "symbol": "I*",
+  "name": "Identity Bird Once Removed",
+  "arity": 2,
+  "rhs": [
+   0,
+   1
+  ]
+ },
+ {
+  "symbol": "W*",
+  "name": "Warbler Once Removed",
+  "arity": 3,
+  "rhs": [
+   [
+    [
+     0,
+     1
+    ],
+    2
+   ],
+   2
+  ]
+ },
+ {
+  "symbol": "C*",
+  "name": "Cardinal Once Removed",
+  "arity": 4,
+  "rhs": [
+   [
+    [
+     0,
+     1
+    ],
+    3
+   ],
+   2
+  ]
+ },
+ {
+  "symbol": "R*",
+  "name": "Robin Once Removed",
+  "arity": 4,
+  "rhs": [
+   [
+    [
+     0,
+     2
+    ],
+    3
+   ],
+   1
+  ]
+ },
+ {
+  "symbol": "F*",
+  "name": "Finch Once Removed",
+  "arity": 4,
+  "rhs": [
+   [
+    [
+     0,
+     3
+    ],
+    2
+   ],
+   1
+  ]
+ },
+ {
+  "symbol": "V*",
+  "name": "Vireo Once Removed",
+  "arity": 4,
+  "rhs": [
+   [
+    [
+     0,
+     3
+    ],
+    1
+   ],
+   2
+  ]
+ },
+ {
+  "symbol": "I**",
+  "name": "Identity Bird Twice Removed",
+  "arity": 3,
+  "rhs": [
+   [
+    0,
+    1
+   ],
+   2
+  ]
+ },
+ {
+  "symbol": "W**",
+  "name": "Warbler Twice Removed",
+  "arity": 4,
+  "rhs": [
+   [
+    [
+     [
+      0,
+      1
+     ],
+     2
+    ],
+    3
+   ],
+   3
+  ]
+ },
+ {
+  "symbol": "C**",
+  "name": "Cardinal Twice Removed",
+  "arity": 5,
+  "rhs": [
+   [
+    [
+     [
+      0,
+      1
+     ],
+     2
+    ],
+    4
+   ],
+   3
+  ]
+ },
+ {
+  "symbol": "R**",
+  "name": "Robin Twice Removed",
+  "arity": 5,
+  "rhs": [
+   [
+    [
+     [
+      0,
+      1
+     ],
+     3
+    ],
+    4
+   ],
+   2
+  ]
+ },
+ {
+  "symbol": "F**",
+  "name": "Finch Twice Removed",
+  "arity": 5,
+  "rhs": [
+   [
+    [
+     [
+      0,
+      1
+     ],
+     4
+    ],
+    3
+   ],
+   2
+  ]
+ },
+ {
+  "symbol": "V**",
+  "name": "Vireo Twice Removed",
+  "arity": 5,
+  "rhs": [
+   [
+    [
+     [
+      0,
+      1
+     ],
+     4
+    ],
+    2
+   ],
+   3
+  ]
+ },
+ {
+  "symbol": "KI",
+  "name": "Kite",
+  "arity": 2,
+  "rhs": 1
+ },
+ {
+  "symbol": "KM",
+  "name": "Konstant Mocker",
+  "arity": 2,
+  "rhs": [
+   1,
+   1
+  ]
+ },
+ {
+  "symbol": "CKM",
+  "name": "Crossed K Mocker",
+  "arity": 2,
+  "rhs": [
+   0,
+   0
+  ]
+ }
+]
